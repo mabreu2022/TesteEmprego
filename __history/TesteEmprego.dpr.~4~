@@ -1,0 +1,18 @@
+program TesteEmprego;
+
+uses
+  Vcl.Forms,
+  Login in 'Login.pas' {FrmLogin},
+  View.Cadastro.Pessoa in 'View\View.Cadastro.Pessoa.pas' {Form1},
+  Dao.Conexao in 'DAO\Dao.Conexao.pas',
+  Dao.Pessoas in 'DAO\Dao.Pessoas.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmLogin, FrmLogin);
+  Application.CreateForm(TForm1, Form1);
+  Application.Run;
+end.

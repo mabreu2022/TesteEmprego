@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2023/02/16 08:49:09.000.224,=C:\Users\conec\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/02/27 17:28:47.000.614,=C:\Users\conec\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/02/27 19:13:13.000.924,=C:\Users\conec\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/02/28 11:09:28.000.115,=C:\Users\conec\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/02/28 11:51:18.000.792,=C:\Users\conec\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/03/02 12:29:36.000.982,=C:\Users\conec\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/03/10 15:02:52.000.959,=C:\Users\conec\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/03/10 15:03:19.000.285,C:\Users\conec\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Fontes\TesteEmprego\Login.pas</Transaction>
+    <Transaction>2023/03/10 15:03:19.000.285,C:\Users\conec\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\Fontes\TesteEmprego\Login.dfm</Transaction>
+    <Transaction>2023/03/10 15:03:24.000.689,C:\Users\conec\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Fontes\TesteEmprego\TesteEmprego.dproj</Transaction>
+    <Transaction>2023/03/10 15:09:39.000.961,=C:\Fontes\TesteEmprego\Unit1.pas</Transaction>
+    <Transaction>2023/03/10 15:19:47.000.159,C:\Fontes\TesteEmprego\Unit1.pas=C:\Fontes\TesteEmprego\View\View.Cadastro.Pessoa.pas</Transaction>
+    <Transaction>2023/03/10 15:19:47.000.159,C:\Fontes\TesteEmprego\Unit1.dfm=C:\Fontes\TesteEmprego\View\View.Cadastro.Pessoa.dfm</Transaction>
+    <Transaction>2023/03/10 15:33:32.000.831,=C:\Fontes\TesteEmprego\DAO\Dao.Conexao.pas</Transaction>
+    <Transaction>2023/03/10 15:34:36.000.765,=C:\Fontes\TesteEmprego\DAO\Dao.Pessoas.pas</Transaction>
+    <Transaction>2023/03/10 16:02:50.000.068,=C:\Fontes\TesteEmprego\Unit1.pas</Transaction>
+    <Transaction>2023/03/10 16:05:04.000.461,C:\Fontes\TesteEmprego\Unit1.pas=C:\Fontes\TesteEmprego\DAO\uDM.pas</Transaction>
+    <Transaction>2023/03/10 16:05:04.000.461,C:\Fontes\TesteEmprego\Unit1.dfm=C:\Fontes\TesteEmprego\DAO\uDM.dfm</Transaction>
+    <Transaction>2023/03/10 16:13:10.000.520,=C:\Fontes\TesteEmprego\DAO\Dao.Inserir.pas</Transaction>
+    <Transaction>2023/03/11 10:00:34.000.372,=C:\Fontes\TesteEmprego\Unit1.pas</Transaction>
+    <Transaction>2023/03/11 10:00:50.000.648,C:\Fontes\TesteEmprego\DAO\Dao.Login.pas=C:\Fontes\TesteEmprego\Unit1.pas</Transaction>
+    <Transaction>2023/03/13 10:40:02.000.472,=C:\Fontes\TesteEmprego\DAO\DAO.Delete.pas</Transaction>
+    <Transaction>2023/03/13 10:40:02.000.508,=C:\Fontes\TesteEmprego\DAO\DAO.Update.pas</Transaction>
+    <Transaction>2023/03/13 10:44:58.000.288,=C:\Fontes\TesteEmprego\Unit1.pas</Transaction>
+    <Transaction>2023/03/13 10:45:22.000.567,C:\Fontes\TesteEmprego\Unit1.pas=C:\Fontes\TesteEmprego\DAO\Dao.Pessoas2.pas</Transaction>
+    <Transaction>2023/03/13 11:43:44.000.866,C:\Fontes\TesteEmprego\DAO\DAO.Update.pas=</Transaction>
+    <Transaction>2023/03/13 12:25:48.000.678,=C:\Fontes\TesteEmprego\Unit1.pas</Transaction>
+    <Transaction>2023/03/13 12:26:02.000.461,C:\Fontes\TesteEmprego\Unit1.pas=C:\Fontes\TesteEmprego\Controller\Controller.Pessoas.pas</Transaction>
+    <Transaction>2023/03/14 11:18:26.310,C:\Fontes\TesteEmprego\DAO\uDM.pas=</Transaction>
+    <Transaction>2023/03/14 11:40:22.672,=C:\Fontes\TesteEmprego\Model\Model.Pessoas.pas</Transaction>
+  </Transactions>
+</BorlandProject>

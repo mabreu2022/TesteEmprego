@@ -1,0 +1,97 @@
+unit DAO.Delete;
+
+interface
+
+uses
+  System.SysUtils,
+  System.Classes,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.UI.Intf,
+  FireDAC.Phys.Intf,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Phys,
+  FireDAC.Phys.PG,
+  FireDAC.Phys.PGDef,
+  FireDAC.VCLUI.Wait,
+  Data.DB,
+  FireDAC.Comp.Client,
+  DAO.Conexao,
+  Vcl.Dialogs,
+  Dao.Pessoas;
+
+type
+  TDAODelete = class
+    private
+       FConexao: TFDConnection;
+       FQuery: TFDQuery;
+
+    public
+      Function Excluir(aPessoa: TPessoa): Boolean;
+      constructor Create;
+      destructor Destroy; override;
+  end;
+
+implementation
+
+{ TExcluir }
+
+constructor TDAODelete.Create;
+begin
+  FConexao:= TConnection.CreateConnection;
+  FQuery:= TFDQuery.Create(nil);
+  FQuery.Connection:= FConexao;
+end;
+
+destructor TDAODelete.Destroy;
+begin
+  if Assigned(FConexao) then
+    FConexao.Free;
+  FQuery.DisposeOf;
+  inherited;
+end;
+
+function TDAODelete.Excluir(aPessoa: TPessoa): Boolean;
+var
+  QryAuxiliar: TFDQuery;
+  FConexao: TFDConnection;
+  Transacao: TFDTransaction;
+begin
+
+  FConexao:= TConnection.CreateConnection;
+  QryAuxiliar := TFDQuery.Create(Nil);
+  QryAuxiliar.Connection:= FConexao;
+
+  Transacao.Connection:= FConexao;
+  Transacao.StartTransaction;
+
+  Result:= True;
+
+  try
+
+    QryAuxiliar.Active := False;
+    QryAuxiliar.SQL.Clear;
+    QryAuxiliar.SQL.Add('DELETE FROM ENDERECO_INTEGRACAO');
+    QryAuxiliar.SQL.Add('WHERE IDPESSOAS= :IDPESSOAS');
+    QryAuxiliar.ParamByName('IDPESSOAS').Value := aPessoa.idpessoa;
+
+    QryAuxiliar.ExecSQL;
+
+
+  except on ex:exception do
+    begin
+      raise Exception.Create('Error ao deletar na tabela pessoas' + ex.Message);
+      Result := False;
+      Transacao.Rollback;
+      QryAuxiliar.Free;
+    end;
+
+  end;
+
+  Transacao.Commit;
+end;
+
+end.

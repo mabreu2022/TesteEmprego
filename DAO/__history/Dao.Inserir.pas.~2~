@@ -1,0 +1,238 @@
+unit Dao.Inserir;
+
+interface
+
+uses
+  System.SysUtils,
+  System.Classes,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.UI.Intf,
+  FireDAC.Phys.Intf,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Phys,
+  FireDAC.Phys.PG,
+  FireDAC.Phys.PGDef,
+  FireDAC.VCLUI.Wait,
+  Data.DB,
+  FireDAC.Comp.Client,
+  DAO.Conexao,
+  Vcl.Dialogs,
+  Dao.Pessoas;
+
+type
+  TIncluir = class
+  private
+    FConn    : TFDConnection;
+    FPessoa  : TPessoa;
+    FDataSet : TDataSource;
+    FQuery   : TFDQuery;
+
+  public
+     function PesquisaId(aTabela: String; aId: String): Integer;
+     function PesquisaIdEndereco(aTabela: string; aIdEndereco: string): Integer;
+     function Inserir(aPessoa: TPessoa): Boolean;
+
+     constructor Create;
+     destructor Destroy; override;
+  end;
+
+implementation
+
+uses
+  View.Cadastro.Pessoa;
+
+{ TIncluir }
+
+constructor TIncluir.Create;
+begin
+  FConn             := TConnection.CreateConnection;
+  FPessoa           := TPessoa.Create;
+  FQuery            := TFDQuery.Create(nil);
+  FQuery.Connection := FConn;
+end;
+
+destructor TIncluir.Destroy;
+begin
+
+  inherited;
+end;
+
+Function TIncluir.Inserir(aPessoa: TPessoa): Boolean;
+var
+   QryPessoa : TFDQuery;
+   QryIntermediaria: TFDQuery;
+   QryEndereco: TFDQuery;
+   QryAuxiliar: TFDQuery;
+   Txt: String;
+   Incluir: TIncluir;
+   Conexao: TConnection;
+   Transacao: TFDTransaction;
+begin
+
+   Conexao:= TConnection.Create;
+
+   QryAuxiliar := TFDQuery.Create(Nil);
+   try
+
+     Transacao            := TFDTransaction.Create(nil);
+     Transacao.Connection := Conexao.CreateConnection;
+     Transacao.StartTransaction;
+
+     try
+
+       QryAuxiliar.Connection := Conexao.CreateConnection;
+       QryAuxiliar.SQL.Clear;
+       QryAuxiliar.SQL.Add('INSERT INTO PUBLIC.PESSOA(idpessoa, FLNATUREZA, DSDOCUMENTO, NMPRIMEIRO, NMSEGUNDO, DTREGISTRO) ');
+       QryAuxiliar.SQL.Add('VALUES (:IDPESSOA, :FLNATUREZA, :DSDOCUMENTO, :NMPRIMEIRO, :NMSEGUNDO, :DTREGISTRO )');
+       QryAuxiliar.ParamByName('IDPESSOA').Value    := aPessoa.idpessoa;
+       QryAuxiliar.ParamByName('FLNATUREZA').Value  := aPessoa.flnatureza;
+       QryAuxiliar.ParamByName('DSDOCUMENTO').Value := aPessoa.dsdocumento;
+       QryAuxiliar.ParamByName('NMPRIMEIRO').Value  := aPessoa.nmprimeiro;
+       QryAuxiliar.ParamByName('NMSEGUNDO').Value   := aPessoa.nmsegundo;
+       QryAuxiliar.ParamByName('DTREGISTRO').Value  := aPessoa.dtregistro;
+       QryAuxiliar.ExecSQL;
+
+       Except on ex:exception do
+       begin
+         raise Exception.Create('Error ao gravar na tabela pessoa' + ex.Message);
+         Transacao.RollBack;
+         Exit;
+       end;
+     end;
+
+   finally
+     QryAuxiliar.Free;
+   end;
+
+   QryIntermediaria:= TFDQuery.Create(nil);
+   try
+     try
+
+       QryIntermediaria.Connection := Conexao.CreateConnection;
+
+       QryIntermediaria.Active:= False;
+       QryIntermediaria.SQL.Clear;
+       QryIntermediaria.SQL.Add('INSERT INTO PUBLIC.ENDERECO ');
+       QryIntermediaria.SQL.Add('(IDENDERECO, IDPESSOA, DSCEP)');
+       QryIntermediaria.SQL.Add('VALUES(:IDENDERECO, :IDPESSOA, :DSCEP)');
+       QryIntermediaria.ParamByName('IDENDERECO').Value    := aPessoa.IdEndereco;
+       QryIntermediaria.ParamByName('IDPESSOA').Value      := aPessoa.idPessoa;
+       QryIntermediaria.ParamByName('DSCEP').Value         := aPessoa.CEP;
+       QryIntermediaria.ExecSQL;
+
+       Except on ex:exception do
+       begin
+         raise Exception.Create('Error ao gravar na tabela Endereco' + ex.Message);
+         Transacao.RollBack;
+         Exit;
+       end;
+
+     end;
+   finally
+     QryIntermediaria.Free;
+   end;
+
+   QryEndereco:= TFDQuery.Create(nil);
+   try
+     try
+
+       QryEndereco.Connection := Conexao.CreateConnection;
+
+       QryEndereco.Active:= False;
+       QryEndereco.SQL.Clear;
+       QryEndereco.SQL.Add('INSERT INTO PUBLIC.ENDERECO_INTEGRACAO');
+       QryEndereco.SQL.Add('(IDENDERECO, DSUF, NMCIDADE, NMBAIRRO, NMLOGRADOURO, DSCOMPLEMENTO)');
+       QryEndereco.SQL.Add('VALUES(:IDENDERECO, :DSUF, :NMCIDADE, :NMBAIRRO, :NMLOGRADOURO, :DSCOMPLEMENTO)');
+       QryEndereco.ParamByName('IDENDERECO').Value    := aPessoa.IdEndereco;
+       QryEndereco.ParamByName('DSUF').Value          := aPessoa.UF;
+       QryEndereco.ParamByName('NMCIDADE').Value      := aPessoa.Cidade;
+       QryEndereco.ParamByName('NMBAIRRO').Value      := aPessoa.Bairro;
+       QryEndereco.ParamByName('NMLOGRADOURO').Value  := aPessoa.Logradouro;
+       QryEndereco.ParamByName('DSCOMPLEMENTO').Value := aPessoa.Complemento;
+       QryEndereco.ExecSQL;
+
+
+       Except on ex:exception do
+       begin
+         raise Exception.Create('Error ao gravar na tabela Endereco_Inegração' + ex.Message);
+         Transacao.RollBack;
+         Exit;
+       end;
+
+     end;
+   finally
+     QryEndereco.Free;
+   end;
+
+   Transacao.Commit;
+   Transacao.DisposeOf;
+
+end;
+
+
+
+function TIncluir.PesquisaId(aTabela, aId: String): Integer;
+var
+  Qry: TFDQuery;
+  Conexao: TConnection;
+begin
+
+  Qry:= TFDQuery.Create(nil);
+
+  try
+
+    Conexao:= TConnection.Create;
+    Qry.Connection :=  Conexao.CreateConnection;
+//    Qry.SQL.Add('select max(:aId) from :aTabela');
+    Qry.SQL.Add('select max(idpessoa) from public.pessoa');
+//    Qry.ParamByName('aId').DataType     := ftString;
+//    Qry.ParamByName('aId').AsString     := aId;
+//    Qry.ParamByName('aTabela').DataType := ftString;
+//    Qry.ParamByName('aTabela').AsString := aTabela;
+    Qry.SQL.SaveToFile('c:\SQL.txt');
+    Qry.Open;
+//    Showmessage('O IdPessoal é : ' + Qry.Fields[0].Text);
+
+    if Qry.Fields[0].IsNull then
+      Result:=1
+    else
+      Result:= Qry.Fields[0].AsInteger + 1;
+
+  finally
+    Qry.Free;
+  end;
+end;
+
+function TIncluir.PesquisaIdEndereco(aTabela, aIdEndereco: string): Integer;
+var
+  Qry: TFDQuery;
+  Conexao: TConnection;
+begin
+
+  Qry:= TFDQuery.Create(nil);
+
+  try
+
+    Conexao:= TConnection.Create;
+    Qry.Connection :=  Conexao.CreateConnection;
+    Qry.SQL.Add('select max(idendereco) from endereco');
+    Qry.SQL.SaveToFile('C:\SQLPesquiaIdEndereco.txt');
+    Qry.Open;
+
+    if Qry.Fields[0].IsNull then
+      Result:=1
+    else
+      Result:= Qry.Fields[0].AsInteger + 1;
+
+//    Showmessage('O IdEndereco é : ' + Qry.Fields[0].Text);
+  finally
+    Qry.Free;
+  end;
+
+end;
+
+end.

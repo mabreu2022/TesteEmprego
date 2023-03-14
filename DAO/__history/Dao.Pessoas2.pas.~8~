@@ -1,0 +1,254 @@
+unit Dao.Pessoas2;
+
+interface
+
+uses
+  System.SysUtils,
+  System.Classes,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.UI.Intf,
+  FireDAC.Phys.Intf,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Phys,
+  FireDAC.Phys.PG,
+  FireDAC.Phys.PGDef,
+  FireDAC.VCLUI.Wait,
+  Data.DB,
+  FireDAC.Comp.Client,
+  DAO.Conexao,
+  Vcl.Dialogs,
+  Dao.Pessoas;
+
+type
+  TIncluir = class
+  private
+    FConn    : TFDConnection;
+    FPessoa  : TPessoa;
+    FDataSet : TDataSource;
+    FQuery   : TFDQuery;
+
+  public
+     function PesquisaId(aTabela: String; aId: String): Integer;
+     function PesquisaIdEndereco(aTabela: string; aIdEndereco: string): Integer;
+     function Inserir(aPessoa: TPessoa): Boolean;
+
+     constructor Create;
+     destructor Destroy; override;
+  end;
+
+type
+  TUpdate = class
+    private
+      FQuery: TFDQuery;
+      FConn: TFDConnection;
+      FPessoa: TPessoa;
+    public
+      function Alterar(aPessoa: TPessoa): Boolean;
+      constructor Create;
+      destructor Destroy; override;
+  end;
+
+type
+  TDelete = class
+    private
+       FConn: TFDConnection;
+       FQuery: TFDQuery;
+
+    public
+      Function Excluir(aPessoa: TPessoa): Boolean;
+      constructor Create;
+      destructor Destroy; override;
+  end;
+
+implementation
+
+{ TIncluir }
+
+constructor TIncluir.Create;
+begin
+  FConn             := TConnection.CreateConnection;
+  FPessoa           := TPessoa.Create;
+  FQuery            := TFDQuery.Create(nil);
+  FQuery.Connection := FConn;
+end;
+
+destructor TIncluir.Destroy;
+begin
+  if Assigned(FConn) then
+    Fconn.Free;
+  FQuery.DisposeOf;
+  inherited;
+end;
+
+function TIncluir.Inserir(aPessoa: TPessoa): Boolean;
+var
+   QryPessoa : TFDQuery;
+   QryAuxiliar: TFDQuery;
+   Txt: String;
+   Incluir: TIncluir;
+   Conexao: TConnection;
+   Transacao: TFDTransaction;
+begin
+
+   Conexao:= TConnection.Create;
+
+   QryAuxiliar := TFDQuery.Create(Nil);
+   try
+
+     Transacao            := TFDTransaction.Create(nil);
+     Transacao.Connection := Conexao.CreateConnection;
+     Transacao.StartTransaction;
+
+     try
+
+       QryAuxiliar.Connection := Conexao.CreateConnection;
+       QryAuxiliar.SQL.Clear;
+       QryAuxiliar.SQL.Add('INSERT INTO PESSOA( NOME, DOCUMENTO, CEP, LOGRADOURO, ');
+       QryAuxiliar.SQL.Add('NUMERO, COMPLEMENTO, BAIRRO, CIDADE, UF, DTREGISTRO) ');
+       QryAuxiliar.SQL.Add('VALUES (:NOME, :DOCUMENTO, :CEP, :LOGRADOURO, :NUMERO, ');
+       QryAuxiliar.SQL.Add(':COMPLEMENTO, :BAIRRO, :CIDADE, :UF, DTREGISTRO )');
+
+       QryAuxiliar.ParamByName('NOME').Value        := aPessoa.nmprimeiro;
+       QryAuxiliar.ParamByName('DOCUMENTO').Value   := aPessoa.dsdocumento;
+       QryAuxiliar.ParamByName('CEP').Value         := aPessoa.CEP;
+       QryAuxiliar.ParamByName('LOGRADOURO').Value  := aPessoa.Logradouro;
+       QryAuxiliar.ParamByName('NUMERO').Value      := aPessoa.numero;
+       QryAuxiliar.ParamByName('COMPLEMENTO').Value := aPessoa.Complemento;
+       QryAuxiliar.ParamByName('BAIRRO').Value      := aPessoa.Bairro;
+       QryAuxiliar.ParamByName('CIDADE').Value      := aPessoa.Cidade;
+       QryAuxiliar.ParamByName('UF').Value          := aPessoa.UF;
+       QryAuxiliar.ParamByName('DTREGISTRO').Value  := aPessoa.dtregistro;
+       QryAuxiliar.ExecSQL;
+
+       Except on ex:exception do
+       begin
+         raise Exception.Create('Error ao alterar a tabela pessoa' + ex.Message);
+         Transacao.RollBack;
+         Exit;
+       end;
+     end;
+
+   finally
+     QryAuxiliar.Free;
+   end;
+
+end;
+
+function TIncluir.PesquisaId(aTabela, aId: String): Integer;
+begin
+
+end;
+
+function TIncluir.PesquisaIdEndereco(aTabela, aIdEndereco: string): Integer;
+begin
+
+end;
+
+{ TUpdate }
+
+function TUpdate.Alterar(aPessoa: TPessoa): Boolean;
+var
+  FQuery: TFDQuery;
+begin
+
+  Result:= True;
+
+  try
+    FQuery:= TFDQuery.Create(nil);
+    FQuery.Connection:= FConn;
+    FQuery.Active := False;
+    FQuery.SQL.Clear;
+    FQuery.SQL.Add('UPDATE PESSOA SET NOME=:NOME, DOCUMENTO=:DOCUMENTO, CEP=:CEP, ');
+    FQuery.SQL.Add('LOGRADOURO=:LOGRADOURO, NUMERO=:NUMERO, COMPLEMENTO=:COMPLEMENTO, ');
+    FQuery.SQL.Add('BAIRRO=:BAIRRO, CIDADE=:CIDADE, UF=:UF, DTREGISTRO=:DTREGISTRO');
+    FQuery.SQL.Add('WHERE IDPESSOAS =:IDPESSOAS');
+    FQuery.ParamByName('NOME').Value        := aPessoa.nmprimeiro;
+    FQuery.ParamByName('DOCUMENTO').Value   := aPessoa.dsdocumento;
+    FQuery.ParamByName('CEP').Value         := aPessoa.CEP;
+    FQuery.ParamByName('LOGRADOURO').Value  := aPessoa.Logradouro;
+    FQuery.ParamByName('NUMERO').Value      := aPessoa.Numero;
+    FQuery.ParamByName('COMPLEMENTO').Value := aPessoa.Complemento;
+    FQuery.ParamByName('BAIRRO').Value      := aPessoa.Bairro;
+    FQuery.ParamByName('CIDADE').Value      := aPessoa.Cidade;
+    FQuery.ParamByName('UF').Value          := aPessoa.UF;
+    FQuery.ParamByName('DTREGISTRO').Value  := aPessoa.dtregistro;
+
+    FQuery.ParamByName('IDPESSOAS').Value   := aPessoa.idpessoa;
+    FQuery.ExecSQL;
+
+
+  except on ex:exception do
+    begin
+      raise Exception.Create('Error ao deletar na tabela endereco' + ex.Message);
+      Result := False;
+    end;
+
+  end;
+
+end;
+
+constructor TUpdate.Create;
+begin
+  FConn             := TConnection.CreateConnection;
+  FPessoa           := TPessoa.Create;
+  FQuery            := TFDQuery.Create(nil);
+  FQuery.Connection := FConn;
+end;
+
+destructor TUpdate.Destroy;
+begin
+  if Assigned(FConn) then
+    Fconn.Free;
+  FQuery.DisposeOf;
+  inherited;
+end;
+
+{ TDelete }
+
+constructor TDelete.Create;
+begin
+
+end;
+
+destructor TDelete.Destroy;
+begin
+
+  inherited;
+end;
+
+function TDelete.Excluir(aPessoa: TPessoa): Boolean;
+var
+  FQuery: TFDQuery;
+begin
+  Result:= True;
+
+  FConn.StartTransaction;
+
+  FQuery:= TFDQuery.Create(nil);
+  try
+
+    FQuery.Active := False;
+    FQuery.SQL.Clear;
+    FQuery.SQL.Add('DELETE FROM PESSOA');
+    FQuery.SQL.Add('WHERE IDPESSOA= :IDPESSOA');
+    FQuery.ParamByName('IDPESSOA').Value := aPessoa.idpessoa;
+    FQuery.ExecSQL;
+
+
+  except on ex:exception do
+    begin
+      raise Exception.Create('Error ao deletar na tabela endereco_integração' + ex.Message);
+      Result := False;
+      FConn.Rollback;
+      FQuery.Free;
+    end;
+
+  end;
+  FQuery.Free;
+end;
+
+end.

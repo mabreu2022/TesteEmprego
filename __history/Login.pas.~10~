@@ -1,0 +1,83 @@
+unit Login;
+
+interface
+
+uses
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Vcl.Imaging.jpeg,
+  Vcl.ExtCtrls,
+  View.Cadastro.Pessoa,
+  Dao.Conexao, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, uDM;
+
+type
+  TFrmLogin = class(TForm)
+    Panel1: TPanel;
+    Button1: TButton;
+    Button2: TButton;
+    Image1: TImage;
+    EdtUsuario: TEdit;
+    EdtSenha: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    FDQuery1: TFDQuery;
+    DataSource1: TDataSource;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmLogin: TFrmLogin;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrmLogin.Button1Click(Sender: TObject);
+begin
+  FDQuery1.Active:= False;
+  FDQuery1.SQL.Clear;
+  FDQuery1.SQL.Add('Select * from login');
+  FDQuery1.SQL.Add('Where usuario=:usuario');
+  FDQuery1.SQL.Add(' and senha=:senha');
+  FDQuery1.ParamByName('usuario').Value := EdtUsuario.Text;
+  FDQuery1.ParamByName('senha').Value   := EdtSenha.Text;
+  FDQuery1.Active:= True;
+  if FDQuery1.RecordCount > 0 then
+    Form1.ShowModal
+  else
+  begin
+    ShowMessage('usuario ou senha não enconntrado');
+    EdtUsuario.SetFocus;
+  end;
+end;
+
+procedure TFrmLogin.Button2Click(Sender: TObject);
+begin
+  EdtUsuario.Text:= '';
+  EdtSenha.Text:='';
+  EdtUsuario.SetFocus;
+end;
+
+procedure TFrmLogin.FormShow(Sender: TObject);
+begin
+  EdtUsuario.SetFocus;
+end;
+
+end.
